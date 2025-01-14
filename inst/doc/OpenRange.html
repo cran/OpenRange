@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+<meta name="author" content="Brian Maitner" />
+
+<meta name="date" content="2025-01-12" />
+
+<title>OpenRange R package</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">OpenRange R package</h1>
+<h4 class="author">Brian Maitner</h4>
+<h4 class="date">2025-01-12</h4>
+
+
+
+<div id="open-range" class="section level1">
+<h1>Open Range</h1>
+<p>Open Range is a database containing Open Access species range maps
+and associated metadata. The database is currently in a pre-alpha,
+proof-of-concept stage. While the methods underlying the range maps are
+documented in the metadata, and the maps follow reasonable best
+practices, they have not been peer-reviewed. They are provided to show a
+working example of what could be done with an Open Access range
+database, and to provide an example of what the underlying database
+might look like. The maps should not be used without critical
+evaluation.</p>
+<div id="licensing" class="section level2">
+<h2>Licensing</h2>
+<p>The maps currently contained in the Open Range database are available
+with a CC-BY license, but we note that additional maps using alternative
+licenses may be applied in the future.</p>
+<div id="accessing-the-maps" class="section level3">
+<h3>Accessing the maps</h3>
+<p>The easiest way to access the species range maps is by querying a
+species name.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(OpenRange)</span></code></pre></div>
+<pre><code>## Loading required package: RPostgreSQL</code></pre>
+<pre><code>## Loading required package: DBI</code></pre>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>pcontorta <span class="ot">&lt;-</span> <span class="fu">OpenRange_load_species</span>(<span class="at">species =</span> <span class="st">&quot;Pinus contorta&quot;</span>)</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a><span class="fu">plot</span>(pcontorta[<span class="dv">2</span>])</span></code></pre></div>
+<p><img role="img" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASAAAAEgCAMAAAAjXV6yAAAAh1BMVEUAAAAAADoAAGYAOmYAOpAAZpAAZrY6AAA6OgA6OmY6OpA6ZpA6ZrY6kNtmAABmOgBmOjpmtttmtv9mwqWQOgCQZjqQkLaQtpCQttuQ29uQ2/+2ZgC2Zjq2kGa22/+2///bkDrbkGbbtmbbtpDb27bb29vb////tmb/25D/27b//7b//9v////ZXQJmAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAMI0lEQVR4nO2dCXvbNgyGmSbLuiPdwd3d0p3puvL//75ZIgGCFCXIIiiLNr7nqaPYEo83IAiCTGqcalHm0g04uhQQIwXESAExUkCMFBAjBcRIATFqBOh3c/fjV+bVs/vrK2PMZ7/4t37+1Zj74dp9HK/emlfv/PXdly+TAuLdWMh/b8zjX6/N3Tfuj09JSZOnBdUM0KCHl/fjV3P3C7zlrz9+N169HgCdOj3o/l2hAH93LCTca8zr4WWgW35aUO0APTy7f04gPnlx/35qnsa37p+H16exy48vH9+OfXw7GJq/JS0A7iaFDDie3J8nIt+EkspPC6odoG/D5d+/nX7cj/DWqS+PY7f8T//Vu9PL0/jAq3fTAvzdsZDTzQ8v4RWIlZ4WVDsf5D3E935IPMJbgxcZbOJh8BoDp1M/42DKCxjvJoX47/3rCGjmaUG1BTT4mvsf/n6TAfI99ICCg1kARAqZAJp5WlBtAXnn8F8OKLOgb2cLGO8mhZQsqPS0oNoCeg+e5CkdNKkPepwtYPyQFDIBNPO0oJpb0MPLh+9yH5TNYqew5sMbb1NZAWBBUMgE0MzTgmrvgwpOuhQHZU4k80FzTnrmaUHtMIvd/zTOwhTQGP9+/uxH2ofvT1PRF8+lAuIs5guZAio/LaiLrsXethsZYroMoJP3+ZKEgUfWZQC9L0UvGNO0dCln60JD7MPXJ89xl7oOBdSlFBAjBcRIATFSQIwUECMFxEgBMVJAjBQQIwXESAExUkCMFBAjBcRIATFSQIwUECMFxEgBMVJAjBQQIwXESAExUkCMFBAjBcTosoDM8X8+x2/hhaWAGCkgRgqIkQJipIAYKSBGCoiRAmKkgBgpIEYKiJECYqSAGCkgRgqIkQJipIAYKSBGwoCuj7dsj/yvww1f5Mu+kAQ7AXT8petiz4KXPKBwPf4z/TOS6wAMLpNchG/EatldsoBOsjaSsRFVtx5JeohRJpkttaizvcQaG0fTYC3EjFI4/lapSneQUFu9P/auORlhRT63CCjzzfCeHVwSgnImxgC9SKKtyWCy1NkUrMk5wqoDCTQz9TQJn8I9Jn5XX/UOkgFk13Q4G32dLEc2NxCBFB3x7DM2Q3R4Q9rYPErknNGCWAIsP/lta8M+2to4YkBnP5guRA7ujWqGmNlWAk5sNliTPTKjKkAbfUiwIRuWJdbaKwSEvnZL5wIfCwvbawQUnt7auTjM7DUDquiaCUsQS9MjNW1ppY3dCwHxOEq2luDXaWMJ1wYI3HNNv4ITom4IAofw+aZixbWlGWQ9VREJwxAbvmaB0daGtVDFLFY5LqLlWDShdYu6XbW9MbV+AwkTLwQjDj7fXLicKjtYVzd4aWsMuiSL4M0hskYbFgp4Ud16wiWaEw7dY2Qfz60/4SMByNg0GKIpWiNSS2UbL1s7eB5KiEaOlx9lF7Zg8MxJQB0nMwrqUi1cf2c521xbP67Hio4o4Lpg3Li23naJvzh/QVCdDrnEoNo0YbF5q25qaeNgO0jFklVato99RED4E2zWAo8i8rHglSyNrg0S2teWVu7VNCc0Gg4dYqlGG4pb/q2aUmrdursatonYCIbUJqOTOu1mTSk2b9faii0wDud0a+NLbkGZw96teYsf7mvMBFBhiGWqqeas2wXL2io/S8XBtmhB1TaEz64r4/JDLCZOEm/E2VBNbVjpmts3VySm4JdD+gOMpASIRAJVhByWsuLuzfXIySNxQMhO57Ewl8XLmtF/3kA9CiATAMWIsRQOIaGKbBSO4XXx5hEAObQgupM4T6jODREDWkPoEIBcAARRNWNCdVuxJFnQFSAkZMqRUIKnZnEYA/ZVa/BjACIuxc9g84DAtmpmMQhH+7EgQiim8ZcsaGaKXruytLDZxBM6CqDkzCOSWHRC06avjf1iGrwjQCSyie0vwYFxVprJ1jqmJGvJ3Hp2R5qJAoL+Z3aDI6/ExxTSwuX+gxvrDFAUutGp7QCpcEbWOfS0c4OuVD7GWjyhgwKKFlQYZ5iCDP1D9z7pzFz3KZseAZGDDaY8mwE8agJlQEtVWDgCsNSU2r600djyeCymxCcfJHPT2nwP8bf/FltS25UGIiMMzw0VjQh3PcanykUtxMurViwHBGQKWhplPuJbLqrwycqc2QEBpRmbcTKb80MWvXXZSsCJlwG5NUnlQwLCpB/OZKUcrKXRTLEUJLRQUaeAxheEUwYUE7Mzg8iYmsQabcphtZDEB0hwMXkUcs7XDYg46SIog2Hj5JmqxD5pgkAZbRR+/HGkLJtSfI44cYlmCJTRRibk8els79YAijdfN6CwPI/5vyULSszFOMF+HRkQTERk03COz7pNwE1taFOskEjEyG6W3SSgmNuycdNVASXKZvp1gAR71Q+g5d2yhJDMBB/KEiupkUyMBqM/XgFIitHhAU1DnzlnnaXwpaoXKqedpofNYB2bmVSbib4DQBkhWIGQkZYAEubUHSCSos8AkRz+LTnpfIyVlqWJd1qxU3FW7VIFtVPM+aRzVQkQHC6SCxt7AJT6Y1P+AMeYXXv6cGXtUgW1U8YHW2ym/hvG2C1F0tlIigccignGtYd7z6hdsrBGSk0ovFfcUTRwfFWwcsnC2sgUTAi2y7LzMWbdbulZtUsW1kZkmYqdD99OPFA8cy1Wu2BZjUS2DskRq6nikCOOvLp/fQCK+SDnit4Z+OBOopOKqDsB5Og2c4FOvm0m9zebugIETqbggPKUkYNVR3Xt9UW0VgLIzAJKaTmfaotOa3PtMp1oKR8bByh0GC2epHaeEJSxObruAlAxW8/sIzo4XubL2OyOegA0s6pwk0xI9qkji/rNDqkHQEkWOgl1TMLE5IQMdUJXbEGWHlrA+T58tgiIUrliQKkBxcSqS0yI3obT3S3EQYmPDuutGCfPAXJw9KG6+voeNFYGyBn49QxDj1h5cJmTFvmL/fVFNJah81MwHAM+2DkX/1weUrSCOaE+ACWWgUdX06k7nejggGv1MOsFUOaEQpiTJDYiRXRJriZEDOVWNr+94Dh9MkGB6yGzWmJnclNZJ4CIdZjEL1uLR80jJXqm8fotyBViIOh7PsvDHj1QgaigpnaZTrQUOiFTEPHeCIiG0NWhUD+AUkLhgEc0n/FOg5FATM5WbiP2AChbcMHs5Ez8Fehwp00B2RsBlPOBRhuSZgxvwGizcRlyQ046BkL4kfc70ePgLGZw6VE5jR0fUNwzTO0BjIYCAEDWWrI0u3ILAkAuOx5EZvJ4ZakJYVhUVX1V4/cQZhCngIr/6SQegiFxY031te1vLhLcZJ2FmRwnMfprhskuYk31NQ/vIwBTOOxL4qKQBrFIiDr2mtrrGr+LMPzLemumgPCOSX56c+W1rd9BMHCSEx6YOUsGWfKHdUSmsS4A4bihgBKhQ8Jd+dtx0thxR1BF90wAOfKOIxnYmwAUV6MmIUQjRXIbrENuIZJ2NPm8DhB+auHITEXdFe3eT5FBNIlk9nL0DXggOPW6MdYhIOqGxi+wjWhyDy7ggjoBhInBbGfeob+BDFpC6GZ8EMmcZkt6F70y/QiDpiRdtK3mmmbvqCTlMznsE3ySjRv3cRKr3BnrBRA2NE8LOfI+mc0ciaJvYYjlJmTyTHM8R+3AoAigm7AgSmjqV6auxtAMdUW92x/dVzQGXDV3wzRW9R8EdAQoJVTs8/Q9c0uAiGaOrBYA1W/O9wYIFvUMoDif2crN+c4A4YqjDCiLH7Oc9bYaK569nNgxRhb4lecXrgoQvSOa2k0sVr2SbM/KJypHWF+AUGd1WgHN3VJHBsoRKGN/ren7DQNa2XWZrnUGCLLRO9a4X1USwgTrfjXuV5WU0j2N5rXtUEcLKaAVUkCcFBAjBbQsHWKMFBCnPQgpIK6O9lX0LQXESAExUkCMFBAjBcRIATFSQIy6B9S6AwrowuV3LwXESAExUkCMFBAjBcRIATHqFNB+m88KiKtpr4pkpYAOIwXESAExUkCMFBAjBcRIATFSQIwUECMFxEgBMVJAjBQQIwXESAExUkCMFBAjBcRIATFSQIwUECMFxEgBMVJAjBQQIwXESAExUkCMFBAjBcRIATFSQIwUECMFxEgBMVJAjBQQIwXESAExUkCMFBAjBcRIATFSQIwUECMFxEgBMfofxrLxgiDA8XQAAAAASUVORK5CYII=" /><!-- --></p>
+</div>
+<div id="checking-map-quality" class="section level3">
+<h3>Checking map quality</h3>
+<p>This is a bit cumbersome, but keep in mind this is a pre-alpha
+version. For now, you can use the function OpenRange_get_stats</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code></pre></div>
+<pre><code>## -- Attaching core tidyverse packages ------------------------ tidyverse 2.0.0 --
+## v dplyr     1.1.4     v readr     2.1.5
+## v forcats   1.0.0     v stringr   1.5.1
+## v ggplot2   3.5.1     v tibble    3.2.1
+## v lubridate 1.9.3     v tidyr     1.3.1
+## v purrr     1.0.2     
+## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()
+## i Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="co"># Grab the stats</span></span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  model_stats <span class="ot">&lt;-</span> <span class="fu">OpenRange_get_stats</span>()</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a><span class="co"># Reformat them into a single table</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a>  model_stats_wide <span class="ot">&lt;-</span> <span class="fu">bind_rows</span>(model_stats<span class="sc">$</span>rangebagging <span class="sc">%&gt;%</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a>                     <span class="fu">mutate</span>(<span class="at">algorithm =</span> <span class="st">&quot;rangebagging&quot;</span>),</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a>                   model_stats<span class="sc">$</span>ppm <span class="sc">%&gt;%</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a>                     <span class="fu">mutate</span>(<span class="at">algorithm =</span> <span class="st">&quot;ppm&quot;</span>),</span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a>                   model_stats<span class="sc">$</span>points <span class="sc">%&gt;%</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a>                     <span class="fu">mutate</span>(<span class="at">algorithm =</span> <span class="st">&quot;points&quot;</span>))</span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co"># Get relevant model stats</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a>  </span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a>  model_stats_wide <span class="sc">%&gt;%</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a>    <span class="fu">filter</span>(model_id <span class="sc">==</span> pcontorta<span class="sc">$</span>model_id)<span class="ot">-&gt;</span>test</span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a>  test <span class="sc">%&gt;%</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a>    <span class="fu">select</span>(cv_mean_train_npresence,cv_mean_test_n_presence,cv_mean_test_auc,cv_mean_train_auc)</span></code></pre></div>
+<pre><code>##   cv_mean_train_npresence cv_mean_test_n_presence cv_mean_test_auc
+## 1                  1348.8                   337.2            0.859
+##   cv_mean_train_auc
+## 1             0.899</code></pre>
+</div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
