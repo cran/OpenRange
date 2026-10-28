@@ -1,6 +1,6 @@
 Package: OpenRange
 Title: Code to Access Open Access Species Range Maps
-Version: 0.0.2
+Version: 0.0.3
 Authors@R: 
     c(
       person("Brian", "Maitner", , "bmaitner@usf.edu", role = c("aut", "cre"),
@@ -15,7 +15,7 @@ Authors@R:
 Description: Allows access to a proof-of-concept database containing Open Access species range models and relevant metadata. Access to the database is via both 'PostgreSQL' connection and API <https://github.com/EnquistLab/Biendata-Frontend>, allowing diverse use-cases.
 License: MIT + file LICENSE
 Encoding: UTF-8
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3
 Depends: R (>= 4.1.0), RPostgreSQL
 Imports: DBI, sf, httr, jsonlite
 Suggests: knitr, rmarkdown, testthat (>= 3.0.0), maps, tidyverse, vcr,
@@ -23,7 +23,7 @@ Suggests: knitr, rmarkdown, testthat (>= 3.0.0), maps, tidyverse, vcr,
 VignetteBuilder: knitr
 Config/testthat/edition: 3
 NeedsCompilation: no
-Packaged: 2026-08-24 18:59:11 UTC; bmaitner
+Packaged: 2026-10-28 17:59:13 UTC; bmaitner
 Author: Brian Maitner [aut, cre] (ORCID:
     <https://orcid.org/0000-0002-2118-9880>),
   Cory Merow [aut],
@@ -33,4 +33,4 @@ Author: Brian Maitner [aut, cre] (ORCID:
   Brian Enquist [aut]
 Maintainer: Brian Maitner <bmaitner@usf.edu>
 Repository: CRAN
-Date/Publication: 2026-08-25 07:10:02 UTC
+Date/Publication: 2026-10-28 19:30:09 UTC
